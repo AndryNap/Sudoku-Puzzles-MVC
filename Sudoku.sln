@@ -1,0 +1,40 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sudoku", "Sudoku\Sudoku.csproj", "{81CDEDEC-45C5-4A9C-A753-7FA2C4A83ECF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sudoku.Tests", "Sudoku.Tests\Sudoku.Tests.csproj", "{B4105FCB-AFC5-40DA-825F-B635AE88C279}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sudoku.IModelsToDAL", "Sudoku.IModelsToDAL\Sudoku.IModelsToDAL.csproj", "{9115D63C-47F8-4137-84A9-3948CCDB92E3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sudoku.DALService", "Sudoku.DALService\Sudoku.DALService.csproj", "{08FC940E-0045-49B8-B40E-A7F2079EB6FE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{81CDEDEC-45C5-4A9C-A753-7FA2C4A83ECF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{81CDEDEC-45C5-4A9C-A753-7FA2C4A83ECF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{81CDEDEC-45C5-4A9C-A753-7FA2C4A83ECF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{81CDEDEC-45C5-4A9C-A753-7FA2C4A83ECF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B4105FCB-AFC5-40DA-825F-B635AE88C279}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B4105FCB-AFC5-40DA-825F-B635AE88C279}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B4105FCB-AFC5-40DA-825F-B635AE88C279}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B4105FCB-AFC5-40DA-825F-B635AE88C279}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9115D63C-47F8-4137-84A9-3948CCDB92E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9115D63C-47F8-4137-84A9-3948CCDB92E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9115D63C-47F8-4137-84A9-3948CCDB92E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9115D63C-47F8-4137-84A9-3948CCDB92E3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{08FC940E-0045-49B8-B40E-A7F2079EB6FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{08FC940E-0045-49B8-B40E-A7F2079EB6FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{08FC940E-0045-49B8-B40E-A7F2079EB6FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{08FC940E-0045-49B8-B40E-A7F2079EB6FE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

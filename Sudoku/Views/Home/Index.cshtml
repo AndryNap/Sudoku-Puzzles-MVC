@@ -1,0 +1,590 @@
+﻿@{
+    ViewBag.Title = "Судоку версия 1.0";
+}
+
+<link href="~/Content/Sudoku.css" rel="stylesheet" />
+<head>
+    <script src="~/Scripts/jquery-1.10.2.js"></script>
+    <script type="text/javascript">
+        var board;
+
+        window.onload = function () {
+           
+            GetBoard();
+            
+        }
+
+        function GetBoard() {
+
+            $.ajax({
+                type: "POST",
+                url: "/Home/GetBoard",
+                cache : false,
+                contentType: "application/json",
+                data: "{ prof:" + this.Profile + "}",
+                success: function (data) {             
+                    toBoard(JSON.parse(data));
+                    ProfileVariantInfo();
+                    
+                }
+            });
+        };
+   
+
+
+        var Profile = 1;
+        
+        
+        var SquareSize = 3;
+        var BoardSize = SquareSize * SquareSize;
+        
+
+        var CellSize = 60;
+        var SubCellSize = 18;
+
+        function RadioInit() {
+            for (var i = 1; i < 8; i++) {
+
+                if (i == this.Profile) {
+                    document.getElementById('prof' + i).checked = true;
+                };
+            };
+        };
+
+        function SetProfile(profile) {
+            this.Profile = profile.value;
+            GetBoard();
+        };
+
+        function Verify() {
+            $.ajax({
+                type: "POST",
+                url: "/Home/Verify",
+                cache: false,
+                contentType: "application/json",
+                data: "{ prof:" + this.Profile + "}",
+                success: function (data) {
+                    if (JSON.parse(data)) {
+                        message.innerHTML = "В решении нет ошибок";
+                    }
+                    else
+                    {
+                        message.innerHTML = "В решении есть ошибки";
+                    }
+                }
+            });
+        };
+
+        function ShowSolution() {
+            $.ajax({
+                type: "POST",
+                url: "/Home/ShowSolution",
+                cache: false,
+                contentType: "application/json",
+                data: "{ prof:" + this.Profile + "}",
+                success: function (data) {
+                    toBoard(JSON.parse(data));
+                    ProfileVariantInfo();                 
+                }
+            });
+        };
+
+        function Recovery() {
+            $.ajax({
+                type: "POST",
+                url: "/Home/Recovery",
+                cache: false,
+                contentType: "application/json",
+                data: "{ prof:" + this.Profile + "}",
+                success: function (data) {
+                    toBoard(JSON.parse(data));
+                    ProfileVariantInfo();
+                }
+            });
+        };
+
+        function UndoStep() {
+            $.ajax({
+                type: "POST",
+                url: "/Home/UndoStep",
+                cache: false,
+                contentType: "application/json",
+                data: "{ prof:" + this.Profile + "}",
+                success: function (data) {
+                    toBoard(JSON.parse(data));
+                    ProfileVariantInfo();
+                }
+            });
+        };
+
+        function NewGame() {
+            $.ajax({
+                type: "POST",
+                url: "/Home/NewGame",
+                cache: false,
+                contentType: "application/json",
+                data: "{ prof:" + this.Profile + "}",
+                success: function (data) {
+                    toBoard(JSON.parse(data));
+                    ProfileVariantInfo();
+                }
+            });
+        };
+
+        function OpenCell() {
+            var cell = GetCell(new Location(selectRow, selectCol));
+            if ( cell.value == 0 )
+            {
+                $.ajax({
+                    type: "POST",
+                    url: "/Home/OpenCell",
+                    cache: false,
+                    contentType: "application/json",
+                    data: "{ i:"+ cell.i +",j:"+cell.j+",prof:" + this.Profile + "}",
+                    success: function (data) {
+                        toBoard(JSON.parse(data));
+                        ProfileVariantInfo();
+                    }
+                });
+            }
+        };
+
+        function ToBegin()
+        {
+            $.ajax({
+                type: "POST",
+                url: "/Home/ToBegin",
+                cache: false,
+                contentType: "application/json",
+                data: "{ prof:" + this.Profile + "}",
+                success: function (data) {
+                    toBoard(JSON.parse(data));
+                    ProfileVariantInfo();
+                }
+            });
+        }
+
+        function GetCell(loc) {
+            return board.SBoard[loc.row][loc.col];
+        };
+
+        Array.prototype.contains = function (obj) {
+            var i = this.length;
+            while (i--) {
+                if (this[i] === obj) {
+                    return true;
+                };
+            };
+            return false;
+        };
+
+        function relMouseCoords(event) {
+            var totalOffsetX = 0;
+            var totalOffsetY = 0;
+            var canvasX = 0;
+            var canvasY = 0;
+            var currentElement = this;
+
+            do {
+                totalOffsetX += currentElement.offsetLeft;
+                totalOffsetY += currentElement.offsetTop;
+            }
+            while (currentElement = currentElement.offsetParent);
+
+            canvasX = event.pageX - totalOffsetX;
+            canvasY = event.pageY - totalOffsetY;
+
+            return { x: canvasX, y: canvasY };
+        };
+
+        HTMLCanvasElement.prototype.relMouseCoords = relMouseCoords;
+              
+
+        function Location(row, col) {
+            this.row = row;
+            this.col = col;
+        };
+        
+    </script>
+    
+</head>
+
+<h2 style="color:blue">Судоку версия 1.0</h2>
+<br />
+<body>
+    <div id='sudoku'>
+        <div id='banner'>
+            <span id='big'></span>
+            <span id='small'></span>
+        </div>
+
+        <div id='main'>
+            <div  align= "center">
+                <span id="profile" style="color: blue; font-size:16px;"></span><br />
+                <span id="variant" style="color: blue; font-size:16px;"></span><br />
+                <div>
+                    <input type="radio"  id="prof1" name="prof" onclick="SetProfile(this)" value="1"/>
+                    <label for="prof1" class="radiolabel">Профиль 1</label>
+                    <input type="radio" id="prof2" name="prof" onclick="SetProfile(this)" value="2"/>
+                    <label for="prof2" class="radiolabel">Профиль 2</label>
+                    <input type="radio" id="prof3" name="prof" onclick="SetProfile(this)" value="3"/>
+                    <label for="prof3" class="radiolabel">Профиль 3</label>
+                    <input type="radio" id="prof4" name="prof" onclick="SetProfile(this)" value="4"/>
+                    <label for="prof4" class="radiolabel">Профиль 4</label>
+                    <input type="radio" id="prof5" name="prof" onclick="SetProfile(this)" value="5"/>
+                    <label for="prof5" class="radiolabel">Профиль 5</label>
+                    @*<input type="radio" id="prof6" name="prof" onclick="SetProfile(this)" value="6"/>
+                    <label for="prof6" class="radiolabel">Профиль 6</label>
+                    <input type="radio" id="prof7" name="prof" onclick="SetProfile(this)" value="7"/>
+                    <label for="prof7" class="radiolabel">Профиль 7</label>*@
+                </div>
+            </div>
+            <br>
+            <table>
+                <tr>
+                    <td style="width: 183px" align="left">
+                        <button onclick="ViewAbility()" title='Варианты заполнения ячейки'>Подсказка</button><br />
+                        <button onclick="Verify()" title='Проверка на наличие ошибок'>Проверка</button><br />
+                        <button onclick="UndoStep()" title='Откатывает доску на один шаг назал'>Шаг назад</button><br />
+                        <button onclick="OpenCell()" title='Открывает ячейку'>Открыть</button><br />
+                                         
+                    </td>
+                    <td>
+                        <canvas id='canvas2' width='541' height='65' title="Выберите число для установки">Canvas is not supported by this browser.</canvas>
+                        <canvas id='canvas1' width='541' height='541'>Canvas is not supported by this browser.</canvas>
+                        
+                    </td>
+                    <td style="width: 183px" align="right">
+
+                        <button onclick="ShowSolution()" title='Показывает решени'>Решение</button><br />
+                        <button onclick="Recovery()" title='Восстанавливает игру после показа решения или после чего либо ...'>Восстановить</button><br />                      
+                        <button onclick="ToBegin()" title='Начинает игру заново'>В начало</button><br />
+                        <button onclick="NewGame()" title='Создает новую игру'>Новая Игра</button><br />    
+
+                    </td>
+                    
+                </tr>
+            </table>
+            <div align= "center">
+                <span id="message" style="color: Red; font-size:16px;"></span><br />
+            </div>
+            
+    <script type="text/javascript">
+
+            var CellSize = 60;
+            var SubCellSize = 18;
+
+            var canvas1 = document.getElementById("canvas1");
+            var canvas2 = document.getElementById("canvas2");
+
+
+            var selectRow = 0;
+            var selectCol = 0;
+
+            var showAllowed = false;
+            var showSingles = true;
+
+            function drawGrid() {
+
+                var context = canvas1.getContext('2d');
+                context.strokeStyle = '#808080';
+                for (var i = 0; i <= BoardSize; i++) {
+                    context.beginPath();
+                    var thick = i % 3 == 0;
+                    
+                    context.lineWidth = thick ? 2 : 1;
+                    context.moveTo(i * CellSize + 0.5, 0.5);
+                    context.lineTo(i * CellSize + 0.5, BoardSize * CellSize + 0.5);
+                 
+                    context.moveTo(0.5, i * CellSize + 0.5);
+                    context.lineTo(BoardSize * CellSize + 0.5, i * CellSize + 0.5);
+                    context.stroke();
+                }
+
+            };
+
+
+
+            function drawCells() {
+                var context = canvas1.getContext('2d');
+
+                context.font = "12pt Calibri";
+                context.textAlign = "center";
+                context.textBaseline = "middle";
+                var normalColor = "#aaaaaa";
+                var singleColor = "#ff143c";
+
+
+                for (var row = 0; row < BoardSize; row++)
+                    for (var col = 0; col < BoardSize; col++) {
+
+
+                        if (row == selectRow && col == selectCol) {
+                            var margin = 2;
+                            context.beginPath();
+                            context.rect(col * CellSize + margin + 0.5, row * CellSize + margin + 0.5, CellSize - 2 * margin, CellSize - 2 * margin);
+                            context.fillStyle = "#ffe4e1";
+                            context.fill()
+                        }
+                    }
+                context.fillStyle = "#999999";
+
+                if (showAllowed)
+                {
+                    var context = canvas1.getContext('2d');
+                    for (var row = 0; row < BoardSize; row++)
+                        for (var col = 0; col < BoardSize; col++) {
+                            var cell = GetCell(new Location(row, col));
+                            if (cell.value == 0) {
+                                var allowedValues = cell.allow;
+                                for (var i = 0; i < allowedValues.length; i++) {
+                                    var val = allowedValues[i];
+
+                                    var x = (col + 0.5) * CellSize;
+                                    var y = (row + 0.5) * CellSize;
+                                    var subRow = Math.floor((val - 1) / 3) - 1;
+                                    var subCol = Math.floor((val - 1) % 3) - 1;
+                                    x += subCol * SubCellSize;
+                                    y += subRow * SubCellSize;
+
+                                    var hiddenSingle = allowedValues.length != 1;
+
+                                    context.fillStyle = normalColor;
+                                    context.fillText(val, x, y);
+                                }
+                            }
+                        }
+                    }
+
+                var selectValue = GetCell(new Location(selectRow, selectCol)).value;
+
+                context.font = "32pt Calibri";
+                context.textAlign = "center";
+                context.textBaseline = "middle";
+                var normalForeColor = "#191929";
+                var sameDigitForeColor = "#F91919";
+                context.fillStyle = normalForeColor;
+                for (var row = 0; row < BoardSize; row++)
+                    for (var col = 0; col < BoardSize; col++) {
+                        var cell = GetCell(new Location(row, col));
+                        var x = (col + 0.5) * CellSize;
+                        var y = (row + 0.5) * CellSize;
+                        var sameDigit = cell.value == selectValue && selectValue != 0;
+
+                        var value = cell.value;
+
+                        if (value != 0) {
+                            context.fillStyle = cell.given ? "#2200aa" : "#696969";
+                            if (sameDigit)
+                                context.fillStyle = sameDigitForeColor;
+                            context.fillText(value, x, y);
+                        }
+                    }
+            }
+
+            function ShowAbility() {
+                var context = canvas1.getContext('2d');
+                for (var row = 0; row < BoardSize; row++)
+                    for (var col = 0; col < BoardSize; col++) {
+                        var cell = GetCell(new Location(row, col));
+                        if (cell.value != 0) {
+                            var allowedValues = cell.allow;
+                            for (var i = 0; i < allowedValues.length; i++) {
+                                var val = allowedValues[i];
+
+                                var x = (col + 0.5) * CellSize;
+                                var y = (row + 0.5) * CellSize;
+                                var subRow = Math.floor((val - 1) / 3) - 1;
+                                var subCol = Math.floor((val - 1) % 3) - 1;
+                                x += subCol * SubCellSize;
+                                y += subRow * SubCellSize;
+
+                                var hiddenSingle = allowedValues.length != 1;
+
+                                context.fillStyle = normalColor;
+                                context.fillText(val, x, y);
+                            }
+                        }
+                    }
+
+            };
+
+            function toBoard(b) {
+                this.board = b;
+                canvas1.width = canvas1.width;
+                drawGrid();
+                drawCells();
+            }
+
+            function drawCanvas() {
+                canvas1.width = canvas1.width;
+
+                GetBoard();
+
+            }
+
+
+            //drawCanvas();
+
+
+            function selectCell(row, col) {
+                selectRow = row;
+                selectCol = col;
+                drawCanvas();
+            }
+
+            function ViewAbility()
+            {
+                showAllowed = true;
+                drawGrid();
+                drawCells();
+                showAllowed = false;
+            }
+
+            function ProfileVariantInfo()
+            {
+                profile.innerHTML = "Вариант (сесия) игры : " + this.Profile;
+
+                variant.innerHTML = "Вариант набора Судоку : " + this.board.Variant;
+
+                message.innerHTML = this.board.Message;
+
+                RadioInit();
+            }
+
+            function GetVariant()
+            {
+                return this.board.variant;
+            }
+            function setDigitInCell(digit) {
+                var cell = GetCell(new Location(selectRow, selectCol));
+
+                message.innerHTML = "";
+                if (cell.given)
+                    return;
+                if (digit != 0 && !cell.allow.contains(digit)) {
+                    message.innerHTML = "Недопустимое значение";
+                    return;
+                }
+                cell.value = digit;
+                SetBoard(cell);
+            }
+
+            function SetBoard(cell) {
+                $.ajax({
+                    type: "POST",
+                    url: "/Home/SetBoard",
+                    data: "{ i:"+cell.i+",j:"+cell.j+",value:"+cell.value+ ",prof:" + this.Profile +"}",
+                    dataType: "json",
+                    contentType: "application/json; charset=utf-8",
+                    beforeSend: function () {  },
+                    success: function (data) {
+
+                        toBoard(JSON.parse(data));
+                        ProfileVariantInfo();
+                    }
+                });
+            };
+
+
+
+            canvas1.onmousedown = function canvasMouseDown(ev) {
+                var x = ev.pageX - this.offsetLeft;
+                var y = ev.pageY - this.offsetTop;
+                var coords = this.relMouseCoords(ev);
+                selectCell(Math.floor(coords.y / CellSize), Math.floor(coords.x / CellSize));
+            }
+
+            document.onkeydown = function (ev) {
+
+                switch (ev.keyCode) {
+                    case 37: // left arrow
+                        moveSelection(0, -1);
+                        break;
+                    case 38: // up arrow
+                        moveSelection(-1, 0);
+                        break;
+                    case 39: // right arrow
+                        moveSelection(0, 1);
+                        break;
+                    case 40: // down arrow
+                        moveSelection(1, 0);
+                        break;
+                    default:
+                        var key = Number(ev.keyCode);
+                        var digit = key >= 96 ? key - 96 : key - 48;
+                        if (digit >= 0 && digit <= 9)
+                            setDigitInCell(digit);
+                        break;
+                };
+            };
+
+            function moveSelection(row, col) {
+                selectRow += row;
+                selectCol += col;
+                if (selectRow < 0)
+                    selectRow = 8;
+                else if (selectRow > 8)
+                    selectRow = 0;
+                if (selectCol < 0)
+                    selectCol = 8;
+                else if (selectCol > 8)
+                    selectCol = 0;
+                drawCanvas();
+            }
+
+            var digCellSize = 60;
+
+            function initDigitSource() {
+
+
+                var context = canvas2.getContext('2d');
+                context.strokeStyle = '#808080';
+                var SourceSize = BoardSize;
+                for (var i = 0; i <= SourceSize; i++) {
+                    context.beginPath();
+
+                    context.lineWidth = 1;
+                    context.moveTo(i * digCellSize + 0.5, 0.5);
+                    context.lineTo(i * digCellSize + 0.5, digCellSize + 0.5);
+                    context.stroke();
+                }
+                for (var i = 0; i <= 1; i++) {
+                    context.beginPath();
+
+                    context.lineWidth = 1;
+                    context.moveTo(0.5, i * digCellSize + 0.5);
+                    context.lineTo(SourceSize * digCellSize + 0.5, i * digCellSize + 0.5);
+                    context.stroke();
+                }
+                context.font = "24pt Calibri";
+                context.textAlign = "center";
+                context.textBaseline = "middle";
+                var normalForeColor = "#708090";
+                context.fillStyle = normalForeColor;
+                for (var col = 0; col < SourceSize; col++) {
+                    var x = (col + 0.5) * digCellSize;
+                    var y = 0.5 * digCellSize;
+                    var value = col + 1;
+                    context.fillStyle = normalForeColor;
+                    context.fillText(value, x, y);
+                }
+            }
+            initDigitSource();
+
+            canvas2.onmousedown = function canvasMouseDown(ev) {
+                var x = ev.pageX - this.offsetLeft;
+                var y = ev.pageY - this.offsetTop;
+                var coords = this.relMouseCoords(ev);
+                var dig = Math.floor(coords.x / digCellSize) + 1;
+                if (dig == 10)
+                    dig = 0;
+                setDigitInCell(dig);
+            }
+    </script>
+        </div>
+
+    </div>
+    </body>
+
+
