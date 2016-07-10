@@ -1,4 +1,5 @@
 # MVCSudoku
-Gen unlimited board
 
-simply run 
+Unlimited boards
+
+simply run
